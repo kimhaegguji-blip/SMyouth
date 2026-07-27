@@ -3,7 +3,15 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-  <title>신명유스오케스트라 여름캠프 앱</title>
+  
+  <!-- 💡 스마트폰 홈 화면 추가 시 음악(바이올린) 아이콘 적용 -->
+  <title>여름캠프 앱</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎻</text></svg>">
+  <link rel="apple-touch-icon" href="https://cdnjs.cloudflare.com/ajax/libs/twemoji/14.0.2/72x72/1f3bb.png">
+  <meta name="apple-mobile-web-app-title" content="여름캠프">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+
   <style>
     /* 공통 스타일 & 모바일 화면 높이 완벽 대응 (100dvh) */
     * { box-sizing: border-box; }
@@ -41,8 +49,8 @@
     .task-label { font-size: clamp(1rem, 4vw, 1.2rem); color: #a0c4ff; margin-right: 12px; font-weight: bold; }
     .dash-task-title { font-size: clamp(1.2rem, 5vw, 1.5rem); font-weight: bold; color: #ffffff; word-break: keep-all; }
 
-    /* 💡 PC 기본 상태: 한 줄로 4개 나란히 배치 */
-    .home-bottom { flex: 1; display: flex; flex-direction: row; gap: 15px; padding-bottom: 20px; z-index: 1; width: 100%; max-width: 800px; margin: 0 auto; }
+    /* 💡 수정 3: PC에서는 가로로 꽉 차게 변경 */
+    .home-bottom { flex: 1; display: flex; flex-direction: row; gap: 15px; padding-bottom: 20px; z-index: 1; width: 100%; max-width: 100%; margin: 0; }
     
     /* 💡 모바일 (화면 너비 600px 이하)일 때만: 2x2 Grid로 변경 */
     @media (max-width: 600px) {
@@ -51,7 +59,6 @@
         grid-template-columns: repeat(2, 1fr); 
         grid-template-rows: repeat(2, 1fr); 
         gap: 12px; 
-        max-width: 500px;
       }
     }
     
@@ -65,9 +72,10 @@
        ========================================= */
     #inner-app { display: none; flex-direction: column; height: 100vh; height: 100dvh; width: 100%; }
     
-    .app-header { flex-shrink: 0; background-color: #0b1a30; padding: 10px 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .header-group { display: flex; gap: 4px; flex-wrap: nowrap; }
-    .nav-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 7px 6px; border-radius: 6px; font-weight: bold; font-size: clamp(0.7rem, 2.5vw, 0.85rem); cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    /* 💡 수정 4: 상단 네비게이션 4등분 균등 분할 & 글자 확대 */
+    .app-header { flex-shrink: 0; background-color: #0b1a30; padding: 12px 6px; display: flex; gap: 6px; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1); width: 100%; }
+    
+    .nav-btn { flex: 1; background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 10px 2px; border-radius: 8px; font-weight: bold; font-size: clamp(0.85rem, 3.5vw, 1.1rem); cursor: pointer; transition: 0.2s; white-space: nowrap; text-align: center; }
     .nav-btn:active { transform: scale(0.95); }
     .nav-btn.primary { background: #ffd700; color: #0b1a30; border: none; }
 
@@ -96,8 +104,11 @@
        ========================================= */
     .room-header-title { font-size: 1.7rem; font-weight: 900; color: #0b1a30; padding: 10px 5px 20px 5px; text-align: center; border-bottom: 2px dashed #ccc; margin-bottom: 15px; letter-spacing: 1px; }
     .room-badge { font-size: 1.1rem; font-weight: 900; width: 70px; color: #333; text-align: center; flex-shrink: 0; }
-    .room-highlight { font-size: 1.35rem; font-weight: 900; color: #1e88e5; } 
-    .room-sub { font-size: 0.95rem; color: #777; font-weight: normal; margin-top: 4px; display: block; } 
+    
+    /* 💡 수정 1: 방 배정 텍스트 2줄 분리 최적화 */
+    .room-title { display: flex; flex-direction: column; justify-content: center; }
+    .room-highlight { font-size: 1.35rem; font-weight: 900; color: #1e88e5; line-height: 1.2; } 
+    .room-sub { font-size: 0.95rem; color: #777; font-weight: normal; margin-top: 2px; } 
     .room-people { font-size: 0.95rem; color: #555; margin-top: 8px; word-break: keep-all; line-height: 1.4; }
     
     /* =========================================
@@ -151,7 +162,7 @@
       </div>
     </div>
 
-    <!-- 💡 하단 4개 버튼 (반응형: PC는 한 줄, 모바일은 2x2 격자) -->
+    <!-- 하단 4개 버튼 (PC 가로 꽉 차게 / 모바일 2x2) -->
     <div class="home-bottom">
       <div class="home-btn" onclick="switchView('layout')">
         <div class="home-icon">🗺️</div>
@@ -174,23 +185,20 @@
 
   <!-- 📱 2. 내부 앱 구조 -->
   <div id="inner-app">
+    
+    <!-- 💡 수정 4: 네비게이션 바 (총 5개 버튼 중 현재 화면 버튼은 숨김 처리 -> 4개 버튼이 25%씩 균등 꽉 참) -->
     <div class="app-header">
-      <div class="header-group">
-        <button class="nav-btn primary" onclick="switchView('home')">🏠 첫 화면</button>
-      </div>
-      <div class="header-group">
-        <button class="nav-btn" id="nav-layout" onclick="switchView('layout')">🗺️ 배치도</button>
-        <button class="nav-btn" id="nav-rooms" onclick="switchView('rooms')">🛏️ 방 배정</button>
-        <button class="nav-btn" id="nav-schedule" onclick="switchView('schedule')">📅 일정</button>
-        <button class="nav-btn" id="nav-comments" onclick="switchView('comments')">💬 한마디</button>
-      </div>
+      <button class="nav-btn primary" onclick="switchView('home')">🏠 첫 화면</button>
+      <button class="nav-btn" id="nav-layout" onclick="switchView('layout')">🗺️ 배치도</button>
+      <button class="nav-btn" id="nav-rooms" onclick="switchView('rooms')">🛏️ 방 배정</button>
+      <button class="nav-btn" id="nav-schedule" onclick="switchView('schedule')">📅 일정</button>
+      <button class="nav-btn" id="nav-comments" onclick="switchView('comments')">💬 한마디</button>
     </div>
 
     <!-- 🗺️ 연수원 배치도 화면 -->
     <div id="layout-view" class="view-content" style="display: none;">
       <div class="layout-title">📌 연수원 배치도</div>
       <div class="layout-img-container">
-        <!-- 💡 스크립트에서 구글 시트 데이터를 받아와 이미지 주소가 자동으로 채워집니다 -->
         <img id="layout-img" src="" alt="※ 구글 시트 I16 칸에 구글 드라이브 사진 링크를 넣어주세요.">
       </div>
     </div>
@@ -399,9 +407,10 @@
         let formattedTitle = '';
         const splitIdx = rawNum.indexOf('(');
         
+        // 💡 수정 1: 104호 (4인실) 두 줄 완벽 분리
         if (splitIdx !== -1) {
-            const mainNum = rawNum.substring(0, splitIdx);
-            const subText = rawNum.substring(splitIdx);
+            const mainNum = rawNum.substring(0, splitIdx).trim();
+            const subText = rawNum.substring(splitIdx).trim();
             formattedTitle = `<div class="room-highlight">${mainNum}</div><div class="room-sub">${subText}</div>`;
         } else {
             formattedTitle = `<div class="room-highlight">${rawNum}</div>`;
