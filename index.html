@@ -12,39 +12,52 @@
     /* =========================================
        🏠 1. 첫 화면 (Home View) 스타일 
        ========================================= */
-    #home-view { display: flex; flex-direction: column; height: 100vh; padding: 20px; }
+    #home-view { display: flex; flex-direction: column; height: 100vh; padding: 20px; position: relative; }
     
-    /* 맨 위 1칸: 타이틀 */
-    .home-top { flex: 1.2; display: flex; align-items: center; justify-content: center; text-align: center; }
-    .home-title { font-size: 2.2rem; font-weight: 900; color: #ffd700; text-shadow: 0 4px 15px rgba(255,215,0,0.3); word-break: keep-all; line-height: 1.4; }
+    /* 🎆 불꽃놀이 효과 (CSS Animation) */
+    .fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 60%; z-index: 0; pointer-events: none; overflow: hidden; }
+    .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 2.5s infinite ease-out; opacity: 0; }
+    .fw-1 { top: 20%; left: 20%; background: #ff5722; box-shadow: 0 0 10px #ff5722, 10px -10px 0 #ffd700, -10px -10px 0 #00bcd4, 15px 5px 0 #ffeb3b, -15px 5px 0 #e91e63; animation-delay: 0s; }
+    .fw-2 { top: 30%; left: 75%; background: #4caf50; box-shadow: 0 0 10px #4caf50, 15px -15px 0 #ff9800, -15px -15px 0 #3f51b5, 20px 10px 0 #03a9f4, -20px 10px 0 #9c27b0; animation-delay: 1.2s; }
+    .fw-3 { top: 10%; left: 50%; background: #e91e63; box-shadow: 0 0 10px #e91e63, 10px -20px 0 #00bcd4, -10px -20px 0 #ffeb3b, 25px 0px 0 #4caf50, -25px 0px 0 #ff9800; animation-delay: 0.6s; }
+
+    @keyframes explode {
+      0% { transform: scale(0.1) translateY(50px); opacity: 1; }
+      50% { opacity: 1; }
+      100% { transform: scale(3) translateY(-20px); opacity: 0; }
+    }
+
+    /* 맨 위 1칸: 전광판 내용 통합 */
+    .home-top { flex: 1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1; }
+    .home-title { font-size: 1.8rem; font-weight: 900; color: #ffd700; text-shadow: 0 4px 15px rgba(255,215,0,0.5); margin-bottom: 20px; letter-spacing: 1px; }
     
+    .dash-time { font-size: 3.5rem; font-weight: bold; letter-spacing: 2px; color: #ffffff; margin-bottom: 20px; font-family: monospace; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .task-board { display: flex; align-items: center; justify-content: center; background-color: rgba(30, 58, 95, 0.85); border: 2px solid #ffd700; padding: 15px 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); animation: pulse 2.5s infinite; width: 90%; max-width: 400px; backdrop-filter: blur(5px); }
+    .task-label { font-size: 1.2rem; color: #a0c4ff; margin-right: 15px; font-weight: bold; }
+    .dash-task-title { font-size: 1.5rem; font-weight: bold; color: #ffffff; word-break: keep-all; }
+
     /* 아래 3칸: 버튼 영역 */
-    .home-bottom { flex: 1; display: flex; gap: 10px; padding-bottom: 30px; }
-    .home-btn { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+    .home-bottom { flex: 1; display: flex; gap: 10px; padding-bottom: 20px; z-index: 1; }
+    .home-btn { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); backdrop-filter: blur(5px); }
     .home-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.15); }
     .home-icon { font-size: 2.2rem; margin-bottom: 10px; }
     .home-text { font-size: 0.95rem; font-weight: bold; color: #ffffff; word-break: keep-all; }
 
-
     /* =========================================
-       📱 2. 내부 공통 앱 구조 (Header & Content) 
+       📱 2. 내부 공통 앱 구조 (Header) 
        ========================================= */
     #inner-app { display: none; flex-direction: column; height: 100vh; width: 100%; }
     
-    /* 상단 네비게이션 헤더 */
+    /* 💡 상단 네비게이션 헤더 (일정 버튼 우측 이동) */
     .app-header { flex-shrink: 0; background-color: #0b1a30; padding: 12px 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1); }
     .header-group { display: flex; gap: 6px; }
     .nav-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 7px 8px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .nav-btn:active { transform: scale(0.95); }
     .nav-btn.primary { background: #ffd700; color: #0b1a30; border: none; }
 
-    /* 각 화면별 컨테이너 */
     .view-content { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
 
-    
-    /* =========================================
-       📅 3. 일정 화면 (Schedule View) 스타일 
-       ========================================= */
+    /* 📅 일정 화면 / 🛏️ 방 배정표 화면 컨테이너 */
     .tabs { flex-shrink: 0; display: flex; background: white; border-bottom: 2px solid #ddd; z-index: 9; }
     .tab { flex: 1; text-align: center; padding: 15px 5px; cursor: pointer; font-weight: bold; color: #888; transition: 0.3s; font-size: 0.95rem; }
     .tab.active { color: #0b1a30; border-bottom: 4px solid #0b1a30; background-color: #f8fbff; }
@@ -60,28 +73,25 @@
     .task-name { font-size: 1.15rem; font-weight: bold; color: #111; }
     .note-box { font-size: 0.9rem; color: #666; margin-top: 6px; background: #f9f9f9; padding: 5px 8px; border-radius: 5px; display: inline-block; }
 
-    /* =========================================
-       🛏️ 4. 방 배정표 (Rooms View) 스타일 
-       ========================================= */
     .room-badge { font-size: 1.1rem; font-weight: 900; width: 70px; color: #333; text-align: center; flex-shrink: 0; }
-    
-    /* 💡 호수 강조 및 두줄 방지 */
     .room-title { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .room-highlight { font-size: 1.4rem; font-weight: 900; color: #ff5722; } /* 주황색 굵은 글씨 */
+    .room-highlight { font-size: 1.4rem; font-weight: 900; color: #ff5722; } 
     .room-sub { font-size: 0.95rem; color: #777; font-weight: normal; margin-left: 3px; }
     .room-people { font-size: 0.95rem; color: #555; margin-top: 6px; word-break: keep-all; line-height: 1.4; }
     .room-header-title { font-size: 1.2rem; font-weight: bold; color: #0b1a30; padding: 10px 5px 15px 5px; text-align: center; border-bottom: 2px dashed #ccc; margin-bottom: 15px; }
     
     /* =========================================
-       📺 5. 현재 할 일 (Dashboard View) 스타일 
+       💬 3. 실시간 한마디 (Comments View) 
        ========================================= */
-    #dashboard-view { background-color: #0b1a30; justify-content: center; align-items: center; position: relative; }
-    .dash-header { font-size: 4vw; font-weight: bold; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); margin-bottom: 15px; }
-    .dash-time { font-size: 8vw; font-weight: bold; letter-spacing: 4px; color: #ffffff; margin-bottom: 25px; font-family: monospace; }
-    .task-board { display: flex; align-items: center; justify-content: center; background-color: #1e3a5f; border: 3px solid #ffd700; padding: 20px 60px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: pulse 2.5s infinite; }
-    .task-label { font-size: 2.5vw; color: #a0c4ff; margin-right: 20px; }
-    .dash-task-title { font-size: 4.5vw; font-weight: bold; color: #ffffff; }
-    .footer-marquee { position: absolute; bottom: 25px; width: 100%; font-size: 2vw; color: #d9ead3; white-space: nowrap; }
+    #comments-view { background-color: #f0f4f8; }
+    .comment-input-area { background: white; padding: 15px; display: flex; gap: 8px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .comment-input-area input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; outline: none; }
+    .comment-input-area input:focus { border-color: #0b1a30; }
+    .comment-input-area button { background: #0b1a30; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
+    
+    .comment-bubble { background: white; padding: 12px 15px; border-radius: 15px; border-top-left-radius: 0; margin-bottom: 12px; box-shadow: 0 2px 5px rgba(0,0,0,0.05); display: inline-block; max-width: 90%; }
+    .comment-text { font-size: 1.05rem; color: #333; line-height: 1.4; margin-bottom: 5px; }
+    .comment-time { font-size: 0.75rem; color: #999; }
 
     .loading { text-align: center; padding: 40px; color: #555; font-weight: bold; }
 
@@ -103,47 +113,60 @@
        🏠 1. 첫 화면 (Home View)
        ========================================== -->
   <div id="home-view">
-    <div class="home-top">
-      <div class="home-title">신명유스오케스트라<br>첫 여름캠프</div>
+    <!-- 🎆 불꽃놀이 효과 -->
+    <div class="fireworks">
+      <div class="firework fw-1"></div>
+      <div class="firework fw-2"></div>
+      <div class="firework fw-3"></div>
     </div>
+
+    <!-- 💡 상단 통합 (타이틀 + 전광판) -->
+    <div class="home-top">
+      <div class="home-title">2026. 신명유스오케스트라<br>여름캠프!</div>
+      <div class="dash-time" id="clock">00:00:00</div>
+      <div class="task-board">
+          <span class="task-label">NOW :</span>
+          <span class="dash-task-title" id="currentTask">일정 확인 중...</span>
+      </div>
+    </div>
+
+    <!-- 💡 하단 3버튼 -->
     <div class="home-bottom">
-      <!-- 왼쪽: 방 배정표 -->
       <div class="home-btn" onclick="switchView('rooms')">
         <div class="home-icon">🛏️</div>
         <div class="home-text">방 배정표</div>
       </div>
-      <!-- 가운데: 일정 -->
       <div class="home-btn" onclick="switchView('schedule')">
         <div class="home-icon">📅</div>
         <div class="home-text">일정</div>
       </div>
-      <!-- 오른쪽: 현재 할 일 -->
-      <div class="home-btn" onclick="switchView('dashboard')">
-        <div class="home-icon">📺</div>
-        <div class="home-text">현재 할 일</div>
+      <!-- 💡 '현재 할 일' -> '실시간 한마디'로 변경 -->
+      <div class="home-btn" onclick="switchView('comments')">
+        <div class="home-icon">💬</div>
+        <div class="home-text">실시간 한마디</div>
       </div>
     </div>
   </div>
 
   <!-- ==========================================
-       📱 2. 내부 공통 앱 구조 (일정 / 방 배정표 / 현재 할 일)
+       📱 2. 내부 앱 구조 (일정 / 방배정 / 한마디)
        ========================================== -->
   <div id="inner-app">
-    <!-- 상단 네비게이션 헤더 -->
+    <!-- 💡 상단 네비게이션 헤더 -->
     <div class="app-header">
-      <!-- 왼쪽 그룹 -->
+      <!-- 왼쪽: 첫 화면 이동 -->
       <div class="header-group">
         <button class="nav-btn primary" onclick="switchView('home')">🏠 첫 화면</button>
-        <button class="nav-btn" id="nav-schedule" onclick="switchView('schedule')">📅 일정</button>
       </div>
-      <!-- 오른쪽 그룹 -->
+      <!-- 오른쪽: 일정 버튼을 이쪽으로 옮기고 나머지와 통합 -->
       <div class="header-group">
+        <button class="nav-btn" id="nav-schedule" onclick="switchView('schedule')">📅 일정</button>
         <button class="nav-btn" id="nav-rooms" onclick="switchView('rooms')">🛏️ 방 배정표</button>
-        <button class="nav-btn" id="nav-dashboard" onclick="switchView('dashboard')">📺 현재 할 일</button>
+        <button class="nav-btn" id="nav-comments" onclick="switchView('comments')">💬 한마디</button>
       </div>
     </div>
 
-    <!-- 📅 3. 일정 화면 -->
+    <!-- 📅 일정 화면 -->
     <div id="schedule-view" class="view-content" style="display: none;">
       <div class="tabs">
         <div class="tab active" onclick="switchTab('day1')" id="tab-day1">8월 7일 (금)</div>
@@ -153,29 +176,28 @@
       <div id="schedule-list" class="scroll-container"></div>
     </div>
 
-    <!-- 🛏️ 4. 방 배정표 화면 -->
+    <!-- 🛏️ 방 배정표 화면 -->
     <div id="rooms-view" class="view-content" style="display: none;">
       <div id="rooms-list" class="scroll-container"></div>
     </div>
 
-    <!-- 📺 5. 현재 할 일 화면 -->
-    <div id="dashboard-view" class="view-content" style="display: none;">
-      <div class="dash-header">2026. 신명유스오케스트라 여름캠프!</div>
-      <div class="dash-time" id="clock">00:00:00</div>
-      <div class="task-board">
-          <span class="task-label">NOW :</span>
-          <span class="dash-task-title" id="currentTask">일정 확인 중...</span>
+    <!-- 💬 실시간 한마디 화면 -->
+    <div id="comments-view" class="view-content" style="display: none;">
+      <div class="comment-input-area">
+        <input type="text" id="commentInput" placeholder="캠프에 대한 한마디를 남겨주세요!" onkeypress="if(event.key === 'Enter') submitComment();">
+        <button onclick="submitComment()">등록</button>
       </div>
-      <marquee class="footer-marquee" scrollamount="10">
-          ♬ 신명유스오케스트라 여름캠프에 온 것을 환영합니다! 지정된 시간을 잘 준수해 주세요. ♬
-      </marquee>
+      <div id="comments-list" class="scroll-container" style="padding-top: 20px;">
+        <!-- 한마디 리스트 -->
+      </div>
     </div>
   </div>
 
   <script>
+    // 🔥 기존 배포 URL 유지
     const API_URL = "https://script.google.com/macros/s/AKfycbymsT-fBwVBAphFTFPqm6YwxgxnSHkUeX7BKzVkS8VST3t5zbANaP_aqpWKtXe0ZseBnQ/exec";
 
-    let scheduleData = { day1: [], day2: [], rooms: [] };
+    let scheduleData = { day1: [], day2: [], rooms: [], comments: [] };
     let currentTab = 'day1';
     let currentView = 'home'; 
 
@@ -188,59 +210,59 @@
         document.getElementById('loading').style.display = 'none';
         renderSchedule();
         renderRooms();
+        renderComments(); // 한마디 렌더링 추가
         updateAutoTask();
       } catch (error) {
-        document.getElementById('loading').innerText = '데이터를 불러오는데 실패했습니다. 😢';
-        console.error('Error fetching data:', error);
+        document.getElementById('loading').innerText = '데이터 연결 지연 😢';
       }
     }
     
     fetchData(); 
     setInterval(fetchData, 60000); 
 
-    // 화면(뷰) 전환 및 버튼 숨김/표시 로직
+    // 💡 화면 전환 및 네비게이션 버튼 숨김 처리 로직
     function switchView(view) {
       currentView = view;
       const homeView = document.getElementById('home-view');
       const innerApp = document.getElementById('inner-app');
+      
       const scheduleView = document.getElementById('schedule-view');
       const roomsView = document.getElementById('rooms-view');
-      const dashboardView = document.getElementById('dashboard-view');
+      const commentsView = document.getElementById('comments-view');
 
-      // 상단 메뉴 버튼들
+      // 우측 상단 3개 메뉴 버튼
       const btnSchedule = document.getElementById('nav-schedule');
       const btnRooms = document.getElementById('nav-rooms');
-      const btnDashboard = document.getElementById('nav-dashboard');
+      const btnComments = document.getElementById('nav-comments');
 
       if (view === 'home') {
         homeView.style.display = 'flex';
         innerApp.style.display = 'none';
-        document.body.style.backgroundColor = '#0b1a30'; // 남색 배경
+        document.body.style.backgroundColor = '#0b1a30'; // 남색 배경 (전광판)
       } else {
         homeView.style.display = 'none';
         innerApp.style.display = 'flex';
+        document.body.style.backgroundColor = '#f0f4f8'; // 기본 앱 배경
 
-        // 모든 화면 숨기고 메뉴 버튼 초기화(보이기)
+        // 모두 숨기고 버튼 모두 보이기
         scheduleView.style.display = 'none';
         roomsView.style.display = 'none';
-        dashboardView.style.display = 'none';
+        commentsView.style.display = 'none';
         
         btnSchedule.style.display = 'block';
         btnRooms.style.display = 'block';
-        btnDashboard.style.display = 'block';
+        btnComments.style.display = 'block';
 
+        // 선택된 화면만 보이고, 해당 화면의 네비게이션 버튼은 숨김
         if (view === 'schedule') {
           scheduleView.style.display = 'flex';
-          document.body.style.backgroundColor = '#f0f4f8';
-          btnSchedule.style.display = 'none'; // 현재 화면 버튼 숨기기
+          btnSchedule.style.display = 'none'; 
         } else if (view === 'rooms') {
           roomsView.style.display = 'flex';
-          document.body.style.backgroundColor = '#f0f4f8';
-          btnRooms.style.display = 'none'; // 현재 화면 버튼 숨기기
-        } else if (view === 'dashboard') {
-          dashboardView.style.display = 'flex';
-          document.body.style.backgroundColor = '#0b1a30';
-          btnDashboard.style.display = 'none'; // 현재 화면 버튼 숨기기
+          btnRooms.style.display = 'none'; 
+        } else if (view === 'comments') {
+          commentsView.style.display = 'flex';
+          btnComments.style.display = 'none'; 
         }
       }
     }
@@ -293,6 +315,7 @@
       return merged;
     }
 
+    // 일정표
     function renderSchedule() {
       const list = document.getElementById('schedule-list');
       list.innerHTML = '';
@@ -307,23 +330,14 @@
         const card = document.createElement('div');
         card.className = 'schedule-card ' + getColorClass(item.task);
         let noteHtml = item.note ? `<div class="note-box">💬 ${item.note}</div>` : '';
-        
         card.innerHTML = `
-          <div class="time-badge">
-            <span class="start">${item.startTime}</span>
-            <span class="dash">~</span>
-            <span class="end">${item.endTime}</span>
-          </div>
-          <div class="details">
-            <div class="task-name">${item.task}</div>
-            ${noteHtml}
-          </div>
-        `;
+          <div class="time-badge"><span class="start">${item.startTime}</span><span class="dash">~</span><span class="end">${item.endTime}</span></div>
+          <div class="details"><div class="task-name">${item.task}</div>${noteHtml}</div>`;
         list.appendChild(card);
       });
     }
 
-    // 💡 방 배정표 렌더링 (호수 폰트 크기 및 색상 강조)
+    // 방 배정표
     function renderRooms() {
       const list = document.getElementById('rooms-list');
       const roomData = scheduleData.rooms;
@@ -340,10 +354,8 @@
         card.className = 'schedule-card';
         card.style.borderLeftColor = '#fce5cd'; 
         
-        // "(인원실)"을 기준으로 분리하여 호수 부분을 주황색 굵은 폰트로 처리
         let rawNum = item.roomNumber ? item.roomNumber : '호실 미정';
         let formattedTitle = '';
-        
         const splitIdx = rawNum.indexOf('(');
         if (splitIdx !== -1) {
             const mainNum = rawNum.substring(0, splitIdx);
@@ -354,18 +366,57 @@
         }
         
         let peopleText = item.people ? item.people : '배정 전';
-
         card.innerHTML = `
           <div class="room-badge">${item.roomName}</div>
-          <div class="details">
-            <div class="room-title">${formattedTitle}</div>
-            <div class="room-people">👥 ${peopleText}</div>
-          </div>
-        `;
+          <div class="details"><div class="room-title">${formattedTitle}</div><div class="room-people">👥 ${peopleText}</div></div>`;
         list.appendChild(card);
       });
     }
 
+    // 💡 실시간 한마디 렌더링
+    function renderComments() {
+      const list = document.getElementById('comments-list');
+      const comments = scheduleData.comments;
+      list.innerHTML = '';
+
+      if(!comments || comments.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">첫 번째 한마디를 남겨보세요!</div>';
+        return;
+      }
+
+      comments.forEach(item => {
+        const wrap = document.createElement('div');
+        // 시간에서 시:분 까지만 자르기 처리
+        let shortTime = item.time.substring(11, 16); 
+        wrap.innerHTML = `
+          <div class="comment-bubble">
+            <div class="comment-text">${item.text}</div>
+            <div class="comment-time">${shortTime} 작성됨</div>
+          </div>
+        `;
+        list.appendChild(wrap);
+      });
+    }
+
+    // 💡 실시간 한마디 등록 로직 (GET 파라미터 전송 우회)
+    async function submitComment() {
+      const input = document.getElementById('commentInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      input.value = '';
+      input.placeholder = '등록 중...⏳';
+
+      try {
+        await fetch(API_URL + "?action=addComment&text=" + encodeURIComponent(text));
+        await fetchData(); // 전송 후 리스트 새로고침
+      } catch (e) {
+        console.error('등록 에러:', e);
+      }
+      input.placeholder = '캠프에 대한 한마디를 남겨주세요!';
+    }
+
+    // 시계 & 첫 화면 전광판 탐색
     function updateClock() {
       const now = new Date();
       const hours = String(now.getHours()).padStart(2, '0');
