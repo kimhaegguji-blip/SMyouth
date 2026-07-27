@@ -2,17 +2,24 @@
 <html lang="ko">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes, viewport-fit=cover">
   <title>신명유스오케스트라 여름캠프 앱</title>
   <style>
-    /* 공통 스타일 */
+    /* 공통 스타일 & 모바일 화면 높이 완벽 대응 (100dvh) */
     * { box-sizing: border-box; }
-    html, body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #0b1a30; transition: background-color 0.4s; }
+    html, body { 
+      font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; 
+      margin: 0; padding: 0; 
+      height: 100vh; height: 100dvh; 
+      overflow: hidden; 
+      background-color: #0b1a30; 
+      transition: background-color 0.4s; 
+    }
     
     /* =========================================
        🏠 1. 첫 화면 (Home View) 스타일 
        ========================================= */
-    #home-view { display: flex; flex-direction: column; height: 100vh; padding: 20px; position: relative; }
+    #home-view { display: flex; flex-direction: column; height: 100vh; height: 100dvh; padding: 20px; position: relative; }
     
     .fireworks { position: absolute; top: 0; left: 0; width: 100%; height: 60%; z-index: 0; pointer-events: none; overflow: hidden; }
     .firework { position: absolute; width: 6px; height: 6px; border-radius: 50%; animation: explode 2.5s infinite ease-out; opacity: 0; }
@@ -27,29 +34,27 @@
     }
 
     .home-top { flex: 1.2; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; z-index: 1; width: 100%; }
-    .home-title { font-size: clamp(1.5rem, 5.5vw, 2.8rem); font-weight: 900; color: #ffd700; text-shadow: 0 4px 15px rgba(255,215,0,0.5); margin-bottom: 30px; white-space: nowrap; }
-    .dash-time { font-size: clamp(3.5rem, 13vw, 6rem); font-weight: bold; letter-spacing: 2px; color: #ffffff; margin-bottom: 25px; font-family: monospace; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
+    .home-title { font-size: clamp(1.4rem, 5.5vw, 2.5rem); font-weight: 900; color: #ffd700; text-shadow: 0 4px 15px rgba(255,215,0,0.5); margin-bottom: 25px; white-space: nowrap; }
+    .dash-time { font-size: clamp(3rem, 12vw, 5rem); font-weight: bold; letter-spacing: 2px; color: #ffffff; margin-bottom: 25px; font-family: monospace; text-shadow: 0 2px 10px rgba(0,0,0,0.5); }
     
-    .task-board { display: flex; align-items: center; justify-content: center; background-color: rgba(30, 58, 95, 0.85); border: 2px solid #ffd700; padding: 15px 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); animation: pulse 2.5s infinite; width: 90%; max-width: 400px; backdrop-filter: blur(5px); }
-    .task-label { font-size: 1.2rem; color: #a0c4ff; margin-right: 15px; font-weight: bold; }
-    .dash-task-title { font-size: 1.5rem; font-weight: bold; color: #ffffff; word-break: keep-all; }
+    .task-board { display: flex; align-items: center; justify-content: center; background-color: rgba(30, 58, 95, 0.85); border: 2px solid #ffd700; padding: 15px 25px; border-radius: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.4); animation: pulse 2.5s infinite; width: 95%; max-width: 400px; backdrop-filter: blur(5px); }
+    .task-label { font-size: clamp(1rem, 4vw, 1.2rem); color: #a0c4ff; margin-right: 12px; font-weight: bold; }
+    .dash-task-title { font-size: clamp(1.2rem, 5vw, 1.5rem); font-weight: bold; color: #ffffff; word-break: keep-all; }
 
-    /* 💡 수정 1, 2: 4개 버튼 배열 및 글자 크기 확대 */
-    .home-bottom { flex: 1; display: flex; gap: 8px; padding-bottom: 20px; z-index: 1; width: 100%; }
-    .home-btn { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 15px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); backdrop-filter: blur(5px); padding: 5px; }
+    .home-bottom { flex: 1; display: flex; gap: 8px; padding-bottom: 20px; z-index: 1; width: 100%; justify-content: space-between; }
+    .home-btn { flex: 1; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); border-radius: 12px; display: flex; flex-direction: column; align-items: center; justify-content: center; cursor: pointer; transition: 0.2s; box-shadow: 0 4px 10px rgba(0,0,0,0.3); backdrop-filter: blur(5px); padding: 8px 4px; min-width: 0; }
     .home-btn:active { transform: scale(0.95); background: rgba(255,255,255,0.15); }
-    .home-icon { font-size: 1.8rem; margin-bottom: 8px; }
-    .home-text { font-size: 1.15rem; font-weight: 900; color: #ffffff; text-align: center; line-height: 1.2; word-break: keep-all; }
+    .home-icon { font-size: clamp(1.6rem, 6.5vw, 2.2rem); margin-bottom: 8px; }
+    .home-text { font-size: clamp(0.9rem, 3.5vw, 1.25rem); font-weight: 900; color: #ffffff; text-align: center; line-height: 1.2; word-break: keep-all; }
 
     /* =========================================
        📱 2. 내부 공통 앱 구조 
        ========================================= */
-    #inner-app { display: none; flex-direction: column; height: 100vh; width: 100%; }
+    #inner-app { display: none; flex-direction: column; height: 100vh; height: 100dvh; width: 100%; }
     
-    /* 상단 네비게이션 헤더 (버튼 4개라 간격 좁힘) */
-    .app-header { flex-shrink: 0; background-color: #0b1a30; padding: 10px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1); }
-    .header-group { display: flex; gap: 4px; }
-    .nav-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 7px 6px; border-radius: 6px; font-weight: bold; font-size: 0.8rem; cursor: pointer; transition: 0.2s; white-space: nowrap; }
+    .app-header { flex-shrink: 0; background-color: #0b1a30; padding: 10px 8px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 20; border-bottom: 1px solid rgba(255,255,255,0.1); }
+    .header-group { display: flex; gap: 4px; flex-wrap: nowrap; }
+    .nav-btn { background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 7px 6px; border-radius: 6px; font-weight: bold; font-size: clamp(0.7rem, 2.5vw, 0.85rem); cursor: pointer; transition: 0.2s; white-space: nowrap; }
     .nav-btn:active { transform: scale(0.95); }
     .nav-btn.primary { background: #ffd700; color: #0b1a30; border: none; }
 
@@ -59,16 +64,15 @@
        📅 3. 일정 & 공통 스크롤 
        ========================================= */
     .tabs { flex-shrink: 0; display: flex; background: white; border-bottom: 2px solid #ddd; z-index: 9; }
-    /* 💡 수정 4: 날짜 버튼 글자 크게 & 선택된 탭 화려하게 변경 */
     .tab { flex: 1; text-align: center; padding: 18px 5px; cursor: pointer; font-weight: 900; color: #888; transition: 0.3s; font-size: 1.25rem; }
-    .tab.active { color: #0b1a30; border-bottom: 4px solid #ff5722; background-color: #ffd700; }
+    .tab.active { color: #0b1a30; border-bottom: 4px solid #f6b26b; background-color: #fff2cc; }
     
-    .scroll-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 40px; }
+    .scroll-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 40px; -webkit-overflow-scrolling: touch; }
     .scroll-container::-webkit-scrollbar { width: 6px; }
     .scroll-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 10px; }
     
     .schedule-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); display: flex; align-items: center; border-left: 6px solid #ccc; }
-    .time-badge { font-size: 1rem; font-weight: 900; width: 85px; color: #333; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .time-badge { font-size: 1rem; font-weight: 900; width: 85px; color: #333; text-align: center; display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
     .time-badge .dash { font-size: 0.8rem; color: #aaa; margin: 2px 0; }
     .details { flex: 1; margin-left: 15px; overflow: hidden; }
     .task-name { font-size: 1.15rem; font-weight: bold; color: #111; }
@@ -77,9 +81,7 @@
     /* =========================================
        🛏️ 4. 방 배정표 
        ========================================= */
-    /* 💡 수정 3: 방 배정 현황 타이틀 엄청 크게 */
     .room-header-title { font-size: 1.7rem; font-weight: 900; color: #0b1a30; padding: 10px 5px 20px 5px; text-align: center; border-bottom: 2px dashed #ccc; margin-bottom: 15px; letter-spacing: 1px; }
-    
     .room-badge { font-size: 1.1rem; font-weight: 900; width: 70px; color: #333; text-align: center; flex-shrink: 0; }
     .room-highlight { font-size: 1.35rem; font-weight: 900; color: #1e88e5; } 
     .room-sub { font-size: 0.95rem; color: #777; font-weight: normal; margin-top: 4px; display: block; } 
@@ -89,15 +91,16 @@
        🗺️ 5. 연수원 배치도 (Layout View) 
        ========================================= */
     #layout-view { background-color: #ffffff; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding: 20px; }
-    .layout-title { font-size: 1.5rem; font-weight: 900; color: #0b1a30; margin-bottom: 15px; border-bottom: 3px solid #ffd700; padding-bottom: 5px; }
-    .layout-img-container { flex: 1; width: 100%; overflow: auto; display: flex; justify-content: center; align-items: flex-start; }
-    .layout-img-container img { max-width: 100%; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+    .layout-title { font-size: 1.5rem; font-weight: 900; color: #0b1a30; margin-bottom: 15px; border-bottom: 3px solid #ffd700; padding-bottom: 5px; flex-shrink: 0; }
+    .layout-img-container { flex: 1; width: 100%; overflow: auto; display: flex; justify-content: center; align-items: flex-start; -webkit-overflow-scrolling: touch; }
+    /* 💡 배치도 이미지를 모바일 꽉 차게, 확대 가능하게 설정 */
+    .layout-img-container img { width: 100%; max-width: 800px; height: auto; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: block; }
 
     /* =========================================
        💬 6. 실시간 한마디 
        ========================================= */
     #comments-view { background-color: #f0f4f8; }
-    .comment-input-area { background: white; padding: 15px; display: flex; gap: 8px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); }
+    .comment-input-area { background: white; padding: 15px; display: flex; gap: 8px; border-bottom: 1px solid #ddd; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0; }
     .comment-input-area input { flex: 1; padding: 12px; border: 1px solid #ccc; border-radius: 8px; font-size: 1rem; outline: none; }
     .comment-input-area input:focus { border-color: #0b1a30; }
     .comment-input-area button { background: #0b1a30; color: white; border: none; padding: 0 15px; border-radius: 8px; font-weight: bold; cursor: pointer; white-space: nowrap; }
@@ -138,11 +141,10 @@
       </div>
     </div>
 
-    <!-- 💡 수정 1 & 2: 하단 4개 버튼으로 구성 -->
     <div class="home-bottom">
       <div class="home-btn" onclick="switchView('layout')">
         <div class="home-icon">🗺️</div>
-        <div class="home-text">연수원<br>배치도</div>
+        <div class="home-text">배치도</div>
       </div>
       <div class="home-btn" onclick="switchView('rooms')">
         <div class="home-icon">🛏️</div>
@@ -161,7 +163,7 @@
 
   <!-- 📱 2. 내부 앱 구조 -->
   <div id="inner-app">
-    <!-- 💡 네비게이션 바 (버튼 4개 토글) -->
+    <!-- 네비게이션 바 -->
     <div class="app-header">
       <div class="header-group">
         <button class="nav-btn primary" onclick="switchView('home')">🏠 첫 화면</button>
@@ -178,8 +180,8 @@
     <div id="layout-view" class="view-content" style="display: none;">
       <div class="layout-title">📌 연수원 배치도</div>
       <div class="layout-img-container">
-        <!-- 💡 깃허브에 올리신 이미지 파일명과 정확히 일치해야 합니다 -->
-        <img src="스크린샷 2026-07-27 230602.jpg" alt="연수원 배치도">
+        <!-- 💡 영문 이름 'map.jpg'로 수정 완료 -->
+        <img src="map.jpg" alt="연수원 배치도">
       </div>
     </div>
 
@@ -257,7 +259,6 @@
         homeView.style.display = 'none';
         innerApp.style.display = 'flex';
         
-        // 배경색 분기 (배치도는 흰색, 나머지는 연한 회색)
         document.body.style.backgroundColor = (view === 'layout') ? '#ffffff' : '#f0f4f8';
 
         layoutView.style.display = 'none';
