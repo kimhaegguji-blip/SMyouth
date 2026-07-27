@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>여름캠프 통합 일정 & 전광판</title>
+  <style>
+    /* 공통 스타일 */
+    * { box-sizing: border-box; }
+    html, body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f0f4f8; transition: background-color 0.4s; }
+    
+    /* 📱 전체 일정 (App View) 스타일 */
+    #app-view { display: flex; flex-direction: column; height: 100vh; width: 100%; }
+    .header { flex-shrink: 0; background-color: #0b1a30; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10; }
+    .header-title { font-size: 1.2rem; font-weight: bold; }
+    .btn-dashboard { background: #ffd700; color: #0b1a30; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 0.9rem; transition: 0.2s; }
+    .btn-dashboard:active { transform: scale(0.95); }
+    
+    .tabs { flex-shrink: 0; display: flex; background: white; border-bottom: 2px solid #ddd; z-index: 9; }
+    .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #888; transition: 0.3s; }
+    .tab.active { color: #0b1a30; border-bottom: 4px solid #0b1a30; background-color: #f8fbff; }
+    
+    .schedule-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 30px; }
+    .schedule-container::-webkit-scrollbar { width: 6px; }
+    .schedule-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 10px; }
+    
+    .schedule-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); display: flex; align-items: center; border-left: 6px solid #ccc; }
+    .time-badge { font-size: 1rem; font-weight: 900; width: 85px; color: #333; text-align: center; display: flex; flex-direction: column; align-items: center; }
+    .time-badge .dash { font-size: 0.8rem; color: #aaa; margin: 2px 0; }
+    .details { flex: 1; margin-left: 15px; }
+    .task-name { font-size: 1.15rem; font-weight: bold; color: #111; }
+    .note-box { font-size: 0.9rem; color: #666; margin-top: 6px; background: #f9f9f9; padding: 5px 8px; border-radius: 5px; display: inline-block; }
+    .loading { text-align: center; padding: 40px; color: #555; font-weight: bold; }
+
+    /* 스프레드시트 색상 매핑 */
+    .color-1 { border-left-color: #f4cccc; background-color: #fffafa;}
+    .color-2 { border-left-color: #ffe599; background-color: #fffdf5;}
+    .color-3 { border-left-color: #b6d7a8; background-color: #f7fcf5;}
+    .color-4 { border-left-color: #9fc5e8; background-color: #f5f9ff;}
+    .color-5 { border-left-color: #a2c4c9; background-color: #f2f8f9;}
+    .color-6 { border-left-color: #d5a6bd; background-color: #fcf4f8;}
+    .color-7 { border-left-color: #bbbbbb; background-color: #fcfcfc;}
+
+    /* 📺 전광판 (Dashboard View) 스타일 */
+    #dashboard-view { display: none; flex-direction: column; justify-content: center; align-items: center; height: 100vh; position: relative; }
+    .btn-back { position: absolute; top: 20px; left: 20px; background: rgba(255,255,255,0.2); color: white; border: none; padding: 10px 15px; border-radius: 8px; cursor: pointer; font-weight: bold; font-size: 1rem; z-index: 20; transition: 0.2s; }
+    .btn-back:hover { background: rgba(255,255,255,0.4); }
+    .dash-header { font-size: 4vw; font-weight: bold; color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.4); margin-bottom: 15px; }
+    .dash-time { font-size: 8vw; font-weight: bold; letter-spacing: 4px; color: #ffffff; margin-bottom: 25px; font-family: monospace; }
+    .task-board { display: flex; align-items: center; justify-content: center; background-color: #1e3a5f; border: 3px solid #ffd700; padding: 20px 60px; border-radius: 20px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); animation: pulse 2.5s infinite; }
+    .task-label { font-size: 2.5vw; color: #a0c4ff; margin-right: 20px; }
+    .dash-task-title { font-size: 4.5vw; font-weight: bold; color: #ffffff; }
+    .footer-marquee { position: absolute; bottom: 25px; width: 100%; font-size: 2vw; color: #d9ead3; white-space: nowrap; }
+
+    @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.03); } 100% { transform: scale(1); } }
+  </style>
+</head>
+<body>
+
+  <div id="app-view">
+    <div class="header">
+      <div class="header-title">🎻 2026 여름캠프</div>
+      <button class="btn-dashboard" onclick="toggleMode()">📺 현재 할 일</button>
+    </div>
+    <div class="tabs">
+      <div class="tab active" onclick="switchTab('day1')" id="tab-day1">8월 7일 (금)</div>
+      <div class="tab" onclick="switchTab('day2')" id="tab-day2">8월 8일 (토)</div>
+    </div>
+    <div id="loading" class="loading">일정을 동기화 중입니다...⏳</div>
+    <div id="schedule-list" class="schedule-container"></div>
+  </div>
+
+  <div id="dashboard-view">
+    <button class="btn-back" onclick="toggleMode()">⬅ 전체 일정 보기</button>
+    <div class="dash-header">2026. 신명유스오케스트라 여름캠프!</div>
+    <div class="dash-time" id="clock">00:00:00</div>
+    <div class="task-board">
+        <span class="task-label">NOW :</span>
+        <span class="dash-task-title" id="currentTask">일정 확인 중...</span>
+    </div>
+    <marquee class="footer-marquee" scrollamount="10">
+        ♬ 신명유스오케스트라 여름캠프에 온 것을 환영합니다! 스마트폰으로 전체 일정을 확인해 보세요. ♬
+    </marquee>
+  </div>
+
+  <script>
+    // 🔥 배포 URL이 적용된 부분입니다.
+    const API_URL = "https://script.google.com/macros/s/AKfycbymsT-fBwVBAphFTFPqm6YwxgxnSHkUeX7BKzVkS8VST3t5zbANaP_aqpWKtXe0ZseBnQ/exec";
+
+    let scheduleData = { day1: [], day2: [] };
+    let currentTab = 'day1';
+
+    // Fetch API를 사용하여 구글 스프레드시트 데이터 불러오기
+    async function fetchData() {
+      try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        scheduleData = data;
+        document.getElementById('loading').style.display = 'none';
+        renderSchedule();
+        updateAutoTask();
+      } catch (error) {
+        document.getElementById('loading').innerText = '데이터를 불러오는데 실패했습니다. 😢';
+        console.error('Error fetching data:', error);
+      }
+    }
+    
+    fetchData(); 
+    setInterval(fetchData, 60000); // 1분 자동 갱신
+
+    function toggleMode() {
+      const appView = document.getElementById('app-view');
+      const dashView = document.getElementById('dashboard-view');
+      if (appView.style.display === 'none') {
+        appView.style.display = 'flex';
+        dashView.style.display = 'none';
+        document.body.style.backgroundColor = '#f0f4f8';
+      } else {
+        appView.style.display = 'none';
+        dashView.style.display = 'flex';
+        document.body.style.backgroundColor = '#0b1a30';
+      }
+    }
+
+    function switchTab(day) {
+      currentTab = day;
+      document.getElementById('tab-day1').classList.remove('active');
+      document.getElementById('tab-day2').classList.remove('active');
+      document.getElementById('tab-' + day).classList.add('active');
+      renderSchedule();
+    }
+
+    function getColorClass(task) {
+      if(task.includes("1.")) return "color-1";
+      if(task.includes("2.")) return "color-2";
+      if(task.includes("3.")) return "color-3";
+      if(task.includes("4.")) return "color-4";
+      if(task.includes("5.")) return "color-5";
+      if(task.includes("6.")) return "color-6";
+      if(task !== "") return "color-7"; 
+      return "";
+    }
+
+    function mergeConsecutiveTasks(data) {
+      const validData = data.filter(item => item.task !== "");
+      if(validData.length === 0) return [];
+
+      let merged = [];
+      let currentGroup = null;
+
+      validData.forEach(item => {
+        let parts = item.time.split(':');
+        let h = parseInt(parts[0], 10);
+        let m = parseInt(parts[1], 10) + 30;
+        if(m >= 60) { m -= 60; h += 1; }
+        let endTimeStr = String(h).padStart(2, '0') + ':' + String(m).padStart(2, '0');
+
+        if(!currentGroup) {
+          currentGroup = { startTime: item.time, endTime: endTimeStr, task: item.task, note: item.note };
+        } else {
+          if(currentGroup.task === item.task && currentGroup.note === item.note) {
+            currentGroup.endTime = endTimeStr;
+          } else {
+            merged.push(currentGroup);
+            currentGroup = { startTime: item.time, endTime: endTimeStr, task: item.task, note: item.note };
+          }
+        }
+      });
+      if(currentGroup) merged.push(currentGroup);
+      return merged;
+    }
+
+    function renderSchedule() {
+      const list = document.getElementById('schedule-list');
+      list.innerHTML = '';
+      const mergedData = mergeConsecutiveTasks(scheduleData[currentTab]);
+
+      if(mergedData.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">등록된 일정이 없습니다.</div>';
+        return;
+      }
+
+      mergedData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'schedule-card ' + getColorClass(item.task);
+        let noteHtml = item.note ? `<div class="note-box">💬 ${item.note}</div>` : '';
+        
+        card.innerHTML = `
+          <div class="time-badge">
+            <span class="start">${item.startTime}</span>
+            <span class="dash">~</span>
+            <span class="end">${item.endTime}</span>
+          </div>
+          <div class="details">
+            <div class="task-name">${item.task}</div>
+            ${noteHtml}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    function updateClock() {
+      const now = new Date();
+      const hours = String(now.getHours()).padStart(2, '0');
+      const minutes = String(now.getMinutes()).padStart(2, '0');
+      const seconds = String(now.getSeconds()).padStart(2, '0');
+      document.getElementById('clock').textContent = `${hours}:${minutes}:${seconds}`;
+      updateAutoTask(); 
+    }
+    
+    function updateAutoTask() {
+      if (!scheduleData.day1 || scheduleData.day1.length === 0) return;
+
+      const now = new Date();
+      let activeDay = 'day1';
+      if (now.getMonth() === 7 && now.getDate() === 8) { activeDay = 'day2'; }
+
+      const currentHHMM = String(now.getHours()).padStart(2, '0') + ":" + String(now.getMinutes()).padStart(2, '0');
+      const dayData = scheduleData[activeDay];
+      
+      let currentDoing = "휴식 및 대기"; 
+      for (let i = 0; i < dayData.length; i++) {
+        if (dayData[i].time <= currentHHMM && dayData[i].task !== "") {
+          currentDoing = dayData[i].task;
+        }
+      }
+      document.getElementById('currentTask').innerText = currentDoing;
+    }
+
+    setInterval(updateClock, 1000);
+    updateClock();
+  </script>
+</body>
+</html>
