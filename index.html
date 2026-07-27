@@ -9,15 +9,15 @@
     * { box-sizing: border-box; }
     html, body { font-family: 'Malgun Gothic', '맑은 고딕', sans-serif; margin: 0; padding: 0; height: 100vh; overflow: hidden; background-color: #f0f4f8; transition: background-color 0.4s; }
     
-    /* 📱 전체 일정 (App View) 스타일 */
     #app-view { display: flex; flex-direction: column; height: 100vh; width: 100%; }
     .header { flex-shrink: 0; background-color: #0b1a30; color: white; padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.2); z-index: 10; }
     .header-title { font-size: 1.2rem; font-weight: bold; }
     .btn-dashboard { background: #ffd700; color: #0b1a30; border: none; padding: 8px 12px; border-radius: 8px; font-weight: bold; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.2); font-size: 0.9rem; transition: 0.2s; }
     .btn-dashboard:active { transform: scale(0.95); }
     
+    /* 탭 스타일 수정 (방 배정표 탭 추가) */
     .tabs { flex-shrink: 0; display: flex; background: white; border-bottom: 2px solid #ddd; z-index: 9; }
-    .tab { flex: 1; text-align: center; padding: 15px; cursor: pointer; font-weight: bold; color: #888; transition: 0.3s; }
+    .tab { flex: 1; text-align: center; padding: 15px 5px; cursor: pointer; font-weight: bold; color: #888; transition: 0.3s; font-size: 0.95rem; }
     .tab.active { color: #0b1a30; border-bottom: 4px solid #0b1a30; background-color: #f8fbff; }
     
     .schedule-container { flex: 1; overflow-y: auto; padding: 15px; padding-bottom: 30px; }
@@ -25,11 +25,19 @@
     .schedule-container::-webkit-scrollbar-thumb { background-color: #ccc; border-radius: 10px; }
     
     .schedule-card { background: white; border-radius: 12px; padding: 15px; margin-bottom: 12px; box-shadow: 0 3px 8px rgba(0,0,0,0.05); display: flex; align-items: center; border-left: 6px solid #ccc; }
+    
+    /* 일정용 내부 아이템 */
     .time-badge { font-size: 1rem; font-weight: 900; width: 85px; color: #333; text-align: center; display: flex; flex-direction: column; align-items: center; }
     .time-badge .dash { font-size: 0.8rem; color: #aaa; margin: 2px 0; }
     .details { flex: 1; margin-left: 15px; }
     .task-name { font-size: 1.15rem; font-weight: bold; color: #111; }
     .note-box { font-size: 0.9rem; color: #666; margin-top: 6px; background: #f9f9f9; padding: 5px 8px; border-radius: 5px; display: inline-block; }
+    
+    /* 방 배정표용 내부 아이템 */
+    .room-badge { font-size: 1.1rem; font-weight: 900; width: 70px; color: #333; text-align: center; }
+    .room-title { font-size: 1.2rem; font-weight: bold; color: #0b1a30; }
+    .room-people { font-size: 0.95rem; color: #555; margin-top: 4px; }
+    
     .loading { text-align: center; padding: 40px; color: #555; font-weight: bold; }
 
     /* 스프레드시트 색상 매핑 */
@@ -62,11 +70,15 @@
       <div class="header-title">🎻 2026 여름캠프</div>
       <button class="btn-dashboard" onclick="toggleMode()">📺 현재 할 일</button>
     </div>
+    
+    <!-- 💡 방 배정표 탭이 추가되었습니다 -->
     <div class="tabs">
       <div class="tab active" onclick="switchTab('day1')" id="tab-day1">8월 7일 (금)</div>
       <div class="tab" onclick="switchTab('day2')" id="tab-day2">8월 8일 (토)</div>
+      <div class="tab" onclick="switchTab('rooms')" id="tab-rooms">방 배정표</div>
     </div>
-    <div id="loading" class="loading">일정을 동기화 중입니다...⏳</div>
+    
+    <div id="loading" class="loading">데이터를 동기화 중입니다...⏳</div>
     <div id="schedule-list" class="schedule-container"></div>
   </div>
 
@@ -84,20 +96,19 @@
   </div>
 
   <script>
-    // 🔥 배포 URL이 적용된 부분입니다.
+    // 기존에 제공해주신 API URL 그대로 적용
     const API_URL = "https://script.google.com/macros/s/AKfycbymsT-fBwVBAphFTFPqm6YwxgxnSHkUeX7BKzVkS8VST3t5zbANaP_aqpWKtXe0ZseBnQ/exec";
 
-    let scheduleData = { day1: [], day2: [] };
+    let scheduleData = { day1: [], day2: [], rooms: [] };
     let currentTab = 'day1';
 
-    // Fetch API를 사용하여 구글 스프레드시트 데이터 불러오기
     async function fetchData() {
       try {
         const response = await fetch(API_URL);
         const data = await response.json();
         scheduleData = data;
         document.getElementById('loading').style.display = 'none';
-        renderSchedule();
+        renderView();
         updateAutoTask();
       } catch (error) {
         document.getElementById('loading').innerText = '데이터를 불러오는데 실패했습니다. 😢';
@@ -106,7 +117,7 @@
     }
     
     fetchData(); 
-    setInterval(fetchData, 60000); // 1분 자동 갱신
+    setInterval(fetchData, 60000); 
 
     function toggleMode() {
       const appView = document.getElementById('app-view');
@@ -122,12 +133,13 @@
       }
     }
 
-    function switchTab(day) {
-      currentTab = day;
+    function switchTab(tabId) {
+      currentTab = tabId;
       document.getElementById('tab-day1').classList.remove('active');
       document.getElementById('tab-day2').classList.remove('active');
-      document.getElementById('tab-' + day).classList.add('active');
-      renderSchedule();
+      document.getElementById('tab-rooms').classList.remove('active');
+      document.getElementById('tab-' + tabId).classList.add('active');
+      renderView();
     }
 
     function getColorClass(task) {
@@ -170,9 +182,20 @@
       return merged;
     }
 
-    function renderSchedule() {
+    // 💡 탭에 따라 일정표를 보여줄지 방 배정표를 보여줄지 결정하는 함수
+    function renderView() {
       const list = document.getElementById('schedule-list');
       list.innerHTML = '';
+
+      if (currentTab === 'rooms') {
+        renderRooms(list);
+      } else {
+        renderSchedule(list);
+      }
+    }
+
+    // 일정표 렌더링
+    function renderSchedule(list) {
       const mergedData = mergeConsecutiveTasks(scheduleData[currentTab]);
 
       if(mergedData.length === 0) {
@@ -194,6 +217,35 @@
           <div class="details">
             <div class="task-name">${item.task}</div>
             ${noteHtml}
+          </div>
+        `;
+        list.appendChild(card);
+      });
+    }
+
+    // 방 배정표 렌더링
+    function renderRooms(list) {
+      const roomData = scheduleData.rooms;
+
+      if(!roomData || roomData.length === 0) {
+        list.innerHTML = '<div style="text-align:center; padding:30px; color:#999;">방 배정 정보가 아직 없습니다.</div>';
+        return;
+      }
+
+      roomData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'schedule-card';
+        card.style.borderLeftColor = '#fce5cd'; // 방 배정표 테두리 색상 (살구색)
+        
+        // 배정 인원이나 호실이 안 적혀있으면 기본 텍스트 표시
+        let roomNumText = item.roomNumber ? `${item.roomNumber}호` : '호실 미정';
+        let peopleText = item.people ? item.people : '배정 전';
+
+        card.innerHTML = `
+          <div class="room-badge">${item.roomName}</div>
+          <div class="details">
+            <div class="room-title">${roomNumText}</div>
+            <div class="room-people">👥 인원: ${peopleText}</div>
           </div>
         `;
         list.appendChild(card);
